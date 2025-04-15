@@ -1,0 +1,36 @@
+[package]
+name = "paper-age-gui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+paper-age = { git = "https://github.com/renesat/paper-age.git" }
+age = "0.11.1"
+anyhow = "1.0.95"
+printpdf = { version = "0.8" }
+iced = { version = "0.13", features = [
+  "svg",
+  "advanced",
+  "image",
+  "debug",
+  "tokio",
+] }
+embed_it = "6.0.0"
+rfd = { version = "0.15.2" }
+arcstr = "1.2.0"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tracing-subscriber = "0.3"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+iced = { version = "0.13", features = [
+  "svg",
+  "advanced",
+  "image",
+  "debug",
+  "tokio",
+  "webgl",
+  "fira-sans",
+] }
+console_error_panic_hook = "0.1"
+console_log = "1.0"
