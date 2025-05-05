@@ -2,6 +2,8 @@
 
 Rust base and WASM compatible GUI for [paper-age](https://github.com/matiaskorhonen/paper-age).
 
+![Screenshot](./docs/imgs/screenshot.png)
+
 ## Installation
 
 ### From source

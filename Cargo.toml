@@ -1,7 +1,15 @@
 [package]
 name = "paper-age-gui"
+description = "A tool to search files"
 version = "0.1.0"
 edition = "2021"
+authors = ["Ivan Smoliakov <self@renesat.me>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/renesat/paper-age-gui"
+repository = "https://github.com/renesat/paper-age-gui"
+keywords = ["gui", "secret", "age-encryption"]
+categories = ["cryptography", "gui"]
 
 [dependencies]
 paper-age = { git = "https://github.com/renesat/paper-age.git" }
