@@ -74,7 +74,12 @@
 
         pre-commit.settings = {
           settings = {
-            rust.check.cargoDeps = pkgs.rustPlatform.importCargoLock {lockFile = ./Cargo.lock;};
+            rust.check.cargoDeps = pkgs.rustPlatform.importCargoLock {
+              lockFile = ./Cargo.lock;
+              outputHashes = {
+                "paper-age-1.3.4" = "sha256-BxQMCGb/HZOYX4OZzVNSJ7XS5LcLlAbhrAMElhhcZU4=";
+              };
+            };
           };
           hooks = {
             yamllint.enable = true;
@@ -135,7 +140,6 @@
             wayland
             vulkan-loader
             libxkbcommon
-            xdg-desktop-portal-gtk
           ];
         in
           craneLib.devShell {
