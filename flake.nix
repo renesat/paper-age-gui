@@ -35,7 +35,7 @@
       }: let
         toolchain = pkgs.fenix.fromToolchainFile {
           file = ./rust-toolchain.toml;
-          sha256 = "sha256-X/4ZBHO3iW0fOenQ3foEvscgAPJYl2abspaBThDOukI=";
+          sha256 = "sha256-SBKjxhC6zHTu0SyJwxLlQHItzMzYZ71VCWQC2hOzpRY=";
         };
         craneLib =
           (inputs.crane.mkLib pkgs).overrideToolchain toolchain;
@@ -133,13 +133,14 @@
             freetype.dev
             libGL
             pkg-config
-            xorg.libX11
-            xorg.libXcursor
-            xorg.libXi
-            xorg.libXrandr
+            libX11
+            libXcursor
+            libXi
+            libXrandr
             wayland
             vulkan-loader
             libxkbcommon
+            dbus
           ];
         in
           craneLib.devShell {
