@@ -2,7 +2,7 @@
 name = "paper-age-gui"
 description = "A tool to search files"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["Ivan Smoliakov <self@renesat.me>"]
 license = "MIT"
 readme = "README.md"
