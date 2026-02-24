@@ -1,16 +1,16 @@
-use age::secrecy::{ExposeSecret, SecretBox, SecretString};
+use age::secrecy::{ExposeSecret, SecretString};
 use anyhow::Result;
 use arcstr::ArcStr;
-use embed_it::{Content, Embed};
+use embed_it::Embed;
 use iced::advanced::svg::Handle;
 use iced::widget::{
-    button, column, container, horizontal_space, pick_list, row, scrollable, svg, text,
-    text_editor, text_input, toggler,
+    Space, button, column, container, pick_list, row, scrollable, svg, text, text_editor,
+    text_input, toggler,
 };
 use iced::{Element, Fill, Length, Task, Theme};
-use paper_age::{builder::DocumentBuilder, encryption, page::PageSize};
-use printpdf::PdfSaveOptions;
+use paper_age::{convenience::create_pdf, page::PageSize};
 use rfd::FileHandle;
+use std::io::Cursor;
 use std::sync::Arc;
 
 #[derive(Embed)]
@@ -27,8 +27,8 @@ fn main() -> iced::Result {
     #[cfg(not(target_arch = "wasm32"))]
     tracing_subscriber::fmt::init();
 
-    iced::application(App::title, App::update, App::view)
-        .theme(|_state| Theme::CatppuccinMocha)
+    iced::application(App::default, App::update, App::view)
+        .theme(Theme::CatppuccinMocha)
         .centered()
         .run()
 }
@@ -98,10 +98,6 @@ pub enum Message {
 unsafe impl Send for Message {}
 
 impl App {
-    fn title(&self) -> String {
-        "PaperAge".to_string()
-    }
-
     fn update(&mut self, event: Message) -> Task<Message> {
         match event {
             Message::TitleChanged(data) => {
@@ -203,7 +199,7 @@ impl App {
         }
     }
 
-    fn view(&self) -> Element<Message> {
+    fn view(&self) -> Element<'_, Message> {
         let logo = svg(Handle::from_memory(Assets.logo().content()))
             .height(Length::Fixed(100.0))
             .style(|theme: &Theme, _| svg::Style {
@@ -347,15 +343,6 @@ impl App {
         .into()
     }
 
-    fn encrypt_secret(
-        secret: ArcBytes,
-        passphrase: SecretBox<str>,
-    ) -> Result<String, &'static str> {
-        encryption::encrypt_plaintext(&mut secret.as_ref(), passphrase)
-            .map(|x| x.1)
-            .map_err(|_| "Encryption error")
-    }
-
     async fn generate_pdf(
         title: ArcStr,
         notes_label: ArcStr,
@@ -388,32 +375,28 @@ impl App {
             (Ok(_), Err(e2)) => return vec![e2],
             (Err(e1), Err(e2)) => return vec![e1, e2],
         };
-        let encrypted = match App::encrypt_secret(secret, passphrase) {
-            Ok(encrypted) => encrypted,
-            Err(e) => return vec![Message::GenerateWarning(e.into())],
-        };
-        let builder = DocumentBuilder {
-            title: if title.is_empty() {
+        let mut secret_reader = Cursor::new(secret);
+        let pdf = match create_pdf(
+            if title.is_empty() {
                 "PaperAge".to_string()
             } else {
                 title.to_string()
             },
-            page_size,
-            grid: false, // FIXME: add arg self.grid,
-            notes_label: if notes_label.is_empty() {
+            &mut secret_reader,
+            passphrase.expose_secret(),
+            Some(if notes_label.is_empty() {
                 "Passphrase:".to_string()
             } else {
                 notes_label.to_string()
-            },
-            skip_notes_line: false, // FIXME: add arg self.skip_notes_line,
-        };
-        let pdf = match builder.build(&encrypted) {
-            Ok(pdf) => pdf,
+            }),
+            Some(false),
+            Some(page_size),
+            Some(false),
+        ) {
+            Ok(content) => content,
             Err(err) => return vec![Message::GenerateWarning(format!("Error: {}", err).into())],
         };
-        let mut warnings = vec![];
-        let content = pdf.save(&PdfSaveOptions::default(), &mut warnings);
-        vec![Message::SaveSecretPdf(content.into())]
+        vec![Message::SaveSecretPdf(pdf.into())]
     }
 
     async fn pick_secret() -> Option<FileHandle> {
@@ -431,4 +414,8 @@ impl App {
         };
         Ok(())
     }
+}
+
+fn horizontal_space() -> Space {
+    Space::new().width(Length::Fill)
 }

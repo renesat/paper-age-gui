@@ -12,26 +12,25 @@ keywords = ["gui", "secret", "age-encryption"]
 categories = ["cryptography", "gui"]
 
 [dependencies]
-paper-age = { git = "https://github.com/renesat/paper-age.git" }
+paper-age = "1.4.0"
 age = "0.11.1"
 anyhow = "1.0.95"
-printpdf = { version = "0.8" }
-iced = { version = "0.13", features = [
+iced = { version = "0.14", features = [
   "svg",
   "advanced",
   "image",
   "debug",
   "tokio",
 ] }
-embed_it = "6.0.0"
-rfd = { version = "0.15.2" }
+embed_it = "7.0.0"
+rfd = { version = "0.17" }
 arcstr = "1.2.0"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tracing-subscriber = "0.3"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-iced = { version = "0.13", features = [
+iced = { version = "0.14", features = [
   "svg",
   "advanced",
   "image",
